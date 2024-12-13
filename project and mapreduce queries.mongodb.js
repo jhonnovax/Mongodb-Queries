@@ -171,6 +171,29 @@ db.sales.aggregate([
   { $sort: { "_id.Year": -1, "_id.Province": 1 } }
 ])
 
+// Total sales by year ordered descending
+db.sales.aggregate([
+    {
+        $project:
+        {
+            _id: 0,
+            year: { $substr: ["$join_date", 0, 4] },
+            sales: 1,
+        }
+    },
+    {
+        $group: {
+            _id: { "Year": "$year" },
+            avg_sales: {
+                $sum: {
+                    $multiply: ["$sales.product_qty", "$sales.product_total"]
+                }
+            }
+        }
+    },
+    { $sort: { "avg_sales": -1 } },
+])
+
 
 
 
